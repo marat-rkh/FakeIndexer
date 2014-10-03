@@ -13,7 +13,7 @@ public class Main {
         FakeIndexer fakeIndexer = new FakeIndexer();
         try {
             System.out.println("Start");
-            Map<String, TreeSet<Long>> res = fakeIndexer.makeIndex(Paths.get("/home/mrx/GitRepos/intellij-community"));
+            Map<String, LongList > res = fakeIndexer.makeIndex(Paths.get("/home/mrx/GitRepos/intellij-community"));
             System.out.println("Done - " + res.size());
             res.clear();
         } catch (IOException e) {
@@ -24,12 +24,12 @@ public class Main {
     private static class FakeIndexer {
         private final String TEXT_MIME_PREFIX = "text/";
 
-        public Map<String, TreeSet<Long>> makeIndex(Path largeDir) throws IOException {
+        public Map<String, LongList> makeIndex(Path largeDir) throws IOException {
             List<Path> filesList = getFiles(largeDir);
             long total = filesList.size();
             System.out.println("Files list is obtained: " + total);
             BufferedReader br;
-            Map<String, TreeSet<Long>> indexMap = new TreeMap<String, TreeSet<Long>>();
+            Map<String, LongList > indexMap = new HashMap<String, LongList >();
             long lastFileId = 0;
             int symbol;
             StringBuilder sb = new StringBuilder();
@@ -54,12 +54,15 @@ public class Main {
             return indexMap;
         }
 
-        private void addWord(Map<String, TreeSet<Long>> res, long lastId, String word) {
+        private void addWord(Map<String, LongList > res, long lastId, String word) {
             if(res.containsKey(word)) {
-                res.get(word).add(lastId);
+                LongList files = res.get(word);
+                if(files.last() != lastId) {
+                    res.get(word).add(lastId);
+                }
             } else {
-                TreeSet<Long> newIds = new TreeSet<Long>();
-                newIds.add(lastId);
+                LongList  newIds = new LongList (lastId);
+//                newIds.add();
                 res.put(word, newIds);
             }
         }
