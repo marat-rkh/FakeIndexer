@@ -22,15 +22,15 @@ public class Main {
                 Files.createFile(mimeTypesPath);
                 System.out.println(Files.probeContentType(mimeTypesPath));
                 FileWriter fileWriter = new FileWriter(mimeTypesPath.toFile());
-                List<String> mimeTypes = Arrays.asList("text/plain txt cgi java\n", "text/html htm html shtml");
+                List<String> mimeTypes = Arrays.asList("text/plain\n", "text/html");
                 for (String m : mimeTypes) {
                     fileWriter.append(m);
                 }
                 fileWriter.close();
                 System.out.println(Files.probeContentType(mimeTypesPath));
-                if(!mimeTypesPath.toFile().delete()) {
-                    System.out.println("Not removed");
-                }
+//                if(!mimeTypesPath.toFile().delete()) {
+//                    System.out.println("Not removed");
+//                }
             } else {
                 System.out.println(".mime.types exists");
                 System.out.println(Files.probeContentType(mimeTypesPath));
