@@ -1,3 +1,5 @@
+package main.java;
+
 /**
  * Created by mrx on 03.10.14.
  */
