@@ -28,9 +28,9 @@ public class Main {
                 }
                 fileWriter.close();
                 System.out.println(Files.probeContentType(mimeTypesPath));
-//                if(!mimeTypesPath.toFile().delete()) {
-//                    System.out.println("Not removed");
-//                }
+                if(!mimeTypesPath.toFile().delete()) {
+                    System.out.println("Not removed");
+                }
             } else {
                 System.out.println(".mime.types exists");
                 System.out.println(Files.probeContentType(mimeTypesPath));
