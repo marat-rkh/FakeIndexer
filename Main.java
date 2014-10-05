@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -9,11 +7,46 @@ import java.util.*;
  * Created by mrx on 01.10.14.
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        testMimeTypes();
+    }
+
+    private static void testMimeTypes() throws IOException {
+        String mimeTypesFile = "~/.mime.types";
+        Path mimeTypesPath = Paths.get(mimeTypesFile);
+        if(isMac()) {
+            if(!new File(mimeTypesFile).exists()) {
+                Files.createFile(mimeTypesPath);
+                System.out.println(Files.probeContentType(mimeTypesPath));
+                FileWriter fileWriter = new FileWriter(mimeTypesFile);
+                List<String> mimeTypes = Arrays.asList("text/plain txt cgi java\n", "text/html htm html shtml");
+                for (String m : mimeTypes) {
+                    fileWriter.append(m);
+                }
+                fileWriter.close();
+                System.out.println(Files.probeContentType(mimeTypesPath));
+                if(!mimeTypesPath.toFile().delete()) {
+                    System.out.println("Not removed");
+                }
+            } else {
+                System.out.println(".mime.types exists");
+                System.out.println(Files.probeContentType(mimeTypesPath));
+            }
+        } else {
+            System.out.println("Not a mac");
+        }
+    }
+
+    private static boolean isMac() {
+        final String os = System.getProperty("os.name").toLowerCase();
+        return os.contains("mac");
+    }
+
+    private static void testGC() {
         FakeIndexer fakeIndexer = new FakeIndexer();
         try {
             System.out.println("Start");
-            Map<String, LongList > res = fakeIndexer.makeIndex(Paths.get("/home/mrx/GitRepos/intellij-community"));
+            Map<String, LinkedList<Long> > res = fakeIndexer.makeIndex(Paths.get("/home/mrx/GitRepos/intellij-community"));
             System.out.println("Done - " + res.size());
             res.clear();
         } catch (IOException e) {
@@ -24,12 +57,12 @@ public class Main {
     private static class FakeIndexer {
         private final String TEXT_MIME_PREFIX = "text/";
 
-        public Map<String, LongList> makeIndex(Path largeDir) throws IOException {
+        public Map<String, LinkedList<Long>> makeIndex(Path largeDir) throws IOException {
             List<Path> filesList = getFiles(largeDir);
             long total = filesList.size();
             System.out.println("Files list is obtained: " + total);
             BufferedReader br;
-            Map<String, LongList > indexMap = new HashMap<String, LongList >();
+            Map<String, LinkedList<Long> > indexMap = new HashMap<String, LinkedList<Long> >();
             long lastFileId = 0;
             int symbol;
             StringBuilder sb = new StringBuilder();
@@ -54,15 +87,15 @@ public class Main {
             return indexMap;
         }
 
-        private void addWord(Map<String, LongList > res, long lastId, String word) {
+        private void addWord(Map<String, LinkedList<Long> > res, long lastId, String word) {
             if(res.containsKey(word)) {
-                LongList files = res.get(word);
-                if(files.last() != lastId) {
+                LinkedList<Long> files = res.get(word);
+                if(files.getLast() != lastId) {
                     res.get(word).add(lastId);
                 }
             } else {
-                LongList  newIds = new LongList (lastId);
-//                newIds.add();
+                LinkedList<Long>  newIds = new LinkedList<Long> ();
+                newIds.add(lastId);
                 res.put(word, newIds);
             }
         }
