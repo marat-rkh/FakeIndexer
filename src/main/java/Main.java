@@ -12,13 +12,16 @@ public class Main {
     }
 
     private static void testMimeTypes() throws IOException {
-        String mimeTypesFile = "~/.mime.types";
-        Path mimeTypesPath = Paths.get(mimeTypesFile);
+        String home = System.getProperty("user.home");
+        System.out.println("Home: " + home);
+        String mimeTypesFileName = ".mime.types";
+        Path mimeTypesPath = Paths.get(home + File.separator + mimeTypesFileName);
+        System.out.println(".mime.types path: " + mimeTypesPath.toFile().getAbsolutePath());
         if(isMac()) {
-            if(!new File(mimeTypesFile).exists()) {
+            if(!mimeTypesPath.toFile().exists()) {
                 Files.createFile(mimeTypesPath);
                 System.out.println(Files.probeContentType(mimeTypesPath));
-                FileWriter fileWriter = new FileWriter(mimeTypesFile);
+                FileWriter fileWriter = new FileWriter(mimeTypesPath.toFile());
                 List<String> mimeTypes = Arrays.asList("text/plain txt cgi java\n", "text/html htm html shtml");
                 for (String m : mimeTypes) {
                     fileWriter.append(m);
